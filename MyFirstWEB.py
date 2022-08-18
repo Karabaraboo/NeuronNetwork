@@ -2,7 +2,8 @@
 
 # Import libraries
 
-from random import seed
+import random
+
 import numpy as np
 
 # Creating a class Network
@@ -26,6 +27,7 @@ class Network() :
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
 
+# Returning of output data if input data is 'a'
 
 def feedforward(self, a):
         '''Вернуть выходные данные сети при входных данных "a"'''
@@ -37,6 +39,46 @@ def feedforward(self, a):
             # s = sigmoid(db)
             a = sigmoid(np.dot(w, a)+b)
         return a
+
+# Stochastic gradient descent
+
+def SGD(self, training_data, epochs, mini_batch_size, eta,
+            test_data=None):
+        
+        """Обучаем сеть при помощи мини-пакетов и стохастического градиентного спуска. 
+        training_data – список кортежей "(x, y)", обозначающих обучающие входные данные и 
+        желаемые выходные. 
+        Остальные обязательные параметры говорят сами за себя. 
+        Если test_data задан, тогда сеть будет оцениваться относительно проверочных данных 
+        после каждой эпохи, и будет выводиться текущий прогресс. 
+        Это полезно для отслеживания прогресса, однако существенно замедляет работу. """
+        
+        # training_data     - the list of tuples (x,y) where 
+            # 'x' is an input data, 'y' - an expected output data
+        # epochs            - a number of epochs for training
+        # mini_batch_size   - a size of mini groups of data for training
+        # eta               - a velocity of training
+        # test_data         - a data for a progress tracking
+        
+        if test_data: n_test = len(test_data)
+        n = len(training_data)
+        
+        for j in range(epochs):
+            random.shuffle(training_data)       # Just shuffling of data 'training_data'
+            mini_batches = [
+                training_data[k:k+mini_batch_size]
+                for k in range(0, n, mini_batch_size)]
+            
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, eta)
+                
+            if test_data:
+                print("Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test))
+                
+            else:
+                print("Epoch {0} complete".format(j))
+
 
 np.random.seed(10)
 
