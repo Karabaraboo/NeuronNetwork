@@ -159,13 +159,13 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
     
 
-np.random.seed(10)
+# np.random.seed(10)
 
 
 
-net = Network([2,3,1])
+# net = Network([2,3,1])
 
-print(net.biases)
-print(net.weights)
+# print(net.biases)
+# print(net.weights)
 
-print(net.feedforward(net,np.array([0,1]).reshape(2,1)))
+# print(net.feedforward(net,np.array([0,1]).reshape(2,1)))
