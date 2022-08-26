@@ -20,16 +20,10 @@ class Network() :
                         for x, y in zip(sizes[:-1], sizes[1:])]     # Weights for neurons
                         # In rows - neurons of current layer
                         # In columns - neurons of privious layer
-    
+                        
+    # Returning of output data if input data is 'a'
 
-# Definition of function 'sigmoid'
-
-def sigmoid(z):
-    return 1.0 / (1.0 + np.exp(-z))
-
-# Returning of output data if input data is 'a'
-
-def feedforward(self, a):
+    def feedforward(self, a):
         '''Вернуть выходные данные сети при входных данных "a"'''
         for b, w in zip(self.biases, self.weights):
             # d = np.dot(w, a)      # Multiplication of matrix (by neurons in layer)
@@ -40,9 +34,9 @@ def feedforward(self, a):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-# Stochastic gradient descent
+    # Stochastic gradient descent
 
-def SGD(self, training_data, epochs, mini_batch_size, eta,
+    def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         
         """Обучаем сеть при помощи мини-пакетов и стохастического градиентного спуска. 
@@ -79,9 +73,9 @@ def SGD(self, training_data, epochs, mini_batch_size, eta,
             else:
                 print("Epoch {0} complete".format(j))
 
-# Update of weights and biases for mini_batch
+    # Update of weights and biases for mini_batch
 
-def update_mini_batch(self, mini_batch, eta):
+    def update_mini_batch(self, mini_batch, eta):
         """Обновить веса и смещения сети, применяя градиентный спуск 
         с использованием обратного распространения к одному мини-пакету. 
         mini_batch – это список кортежей (x, y), 
@@ -91,7 +85,7 @@ def update_mini_batch(self, mini_batch, eta):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)  # Back propagation algorithm
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y)  # Sum of derivatives dC/db or dC/dw
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
             
@@ -100,9 +94,9 @@ def update_mini_batch(self, mini_batch, eta):
         self.biases = [b-(eta/len(mini_batch))*nb 
                        for b, nb in zip(self.biases, nabla_b)]
 
-# Back propagation algorithm
+    # Back propagation algorithm
 
-def backprop(self, x, y):
+    def backprop(self, x, y):
         """Вернуть кортеж ``(nabla_b, nabla_w)``, представляющий градиент 
         для функции стоимости C_x.  
         ``nabla_b`` и ``nabla_w`` - послойные списки массивов numpy, 
@@ -110,21 +104,29 @@ def backprop(self, x, y):
         
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
+        
         # прямой проход
         activation = x
         activations = [x] # список для послойного хранения активаций
         zs = [] # список для послойного хранения z-векторов
+        
         for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
+        
         # обратный проход
         delta = self.cost_derivative(activations[-1], y) * \
             sigmoid_prime(zs[-1])   # Calculation of derivative of sigmoid
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
-        """Переменная l в цикле ниже используется не так, как описано во второй главе книги. l = 1 означает последний слой нейронов, l = 2 – предпоследний, и так далее. Мы пользуемся преимуществом того, что в python можно использовать отрицательные индексы в массивах."""
+        
+        """Переменная l в цикле ниже используется не так, как описано во второй главе книги. 
+        l = 1 означает последний слой нейронов, 
+        l = 2 – предпоследний, и так далее. 
+        Мы пользуемся преимуществом того, что в python 
+        можно использовать отрицательные индексы в массивах."""
         for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
@@ -133,15 +135,28 @@ def backprop(self, x, y):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
     
-def evaluate(self, test_data):
+    def evaluate(self, test_data):
         """Вернуть количество проверочных входных данных, для которых нейросеть выдаёт правильный результат. Выходные данные сети – это номер нейрона в последнем слое с наивысшим уровнем активации."""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
-def cost_derivative(self, output_activations, y):
+    def cost_derivative(self, output_activations, y):
         """Вернуть вектор частных производных (чп C_x / чп a) для выходных активаций."""
         return (output_activations-y)
+    
+
+# Definition of function 'sigmoid'
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+# Derivative of sigmoid 
+
+def sigmoid_prime(z):
+    """Производная сигмоиды."""
+    return sigmoid(z)*(1-sigmoid(z))
     
 
 np.random.seed(10)
@@ -153,4 +168,4 @@ net = Network([2,3,1])
 print(net.biases)
 print(net.weights)
 
-print(feedforward(net,np.array([0,1]).reshape(2,1)))
+print(net.feedforward(net,np.array([0,1]).reshape(2,1)))
