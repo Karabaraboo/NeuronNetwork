@@ -30,8 +30,8 @@ def load_data():
     Это удобный формат данных, но для использования в НС полезно будет немного изменить формат 
     ``training_data``. Это делается в функции-обёртке ``load_data_wrapper()``.
     """
-    f = gzip.open('../data/mnist.pkl.gz', 'rb')
-    training_data, validation_data, test_data = pickle.load(f)
+    f = gzip.open('./neural-networks-and-deep-learning/data/mnist.pkl.gz', 'rb')
+    training_data, validation_data, test_data = pickle.load(f, encoding='latin1')
     f.close()
     return (training_data, validation_data, test_data)
 
